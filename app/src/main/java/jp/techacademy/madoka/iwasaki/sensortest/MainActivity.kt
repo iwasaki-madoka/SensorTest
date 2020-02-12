@@ -1,5 +1,6 @@
 package jp.techacademy.madoka.iwasaki.sensortest
 
+import android.graphics.Color
 import android.os.Bundle
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -10,12 +11,23 @@ import android.util.Log
 import android.widget.TextView
 import java.util.*
 
+import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+
+
 class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private var sensorManager: SensorManager? = null
     private var textView: TextView? = null
     private var textInfo: TextView? = null
     private var suddenMoveTime:Long = 0
+    lateinit var mChart: LineChart
+
+    var names = arrayOf("x-value", "y-value", "z-value")
+    var colors = intArrayOf(Color.RED, Color.GREEN, Color.BLUE)
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -29,6 +41,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         // Get an instance of the TextView
         textView = findViewById(R.id.text_view)
+
+        // グラフ描画
+        mChart = findViewById(R.id.lineChart) as LineChart
+
+        mChart.setDescription("") // 表のタイトルを空にする
+        mChart.setData(LineData()) // 空のLineData型インスタンスを追加
 
     }
 
@@ -57,6 +75,24 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val sensorY: Float
         val sensorZ: Float
 
+        val data = mChart.getLineData()
+        if (data != null) {
+            for (i in 0..2) { // 3軸なのでそれぞれ処理します
+                var set = data.getDataSetByIndex(i)
+                if (set == null) {
+                    set = createSet(names[i], colors[i]) // ILineDataSetの初期化は別メソッドにまとめました
+                    data.addDataSet(set)
+                }
+
+                data.addEntry(Entry(set!!.entryCount.toFloat(), event.values[i]), i) // 実際にデータを追加する
+                data.notifyDataChanged()
+            }
+
+            mChart.notifyDataSetChanged() // 表示の更新のために変更を通知する
+            mChart.setVisibleXRangeMaximum(50F) // 表示の幅を決定する
+            mChart.moveViewToX(data.entryCount.toFloat()) // 最新のデータまで表示を移動させる
+        }
+
         if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
             sensorX = event.values[0]
             sensorY = event.values[1]
@@ -81,6 +117,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                             + "\tsensorZ: " + sensorZ)
                 }
             }
+
+
 
             showInfo(event)
         }
@@ -158,6 +196,16 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private fun getNowTime(): Long{
         val date = Date()
         return date.time
+    }
+
+    private fun createSet(label: String, color: Int): LineDataSet {
+        val set = LineDataSet(null, label)
+        set.setLineWidth(2.5f) // 線の幅を指定
+        set.setColor(color) // 線の色を指定
+        set.setDrawCircles(false) // ポイントごとの円を表示しない
+        set.setDrawValues(false) // 値を表示しない
+
+        return set
     }
 
 }

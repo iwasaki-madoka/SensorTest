@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
@@ -7,6 +8,11 @@
     android:orientation="vertical"
     android:background="#afe"
     tools:context=".MainActivity">
+
+    <com.github.mikephil.charting.charts.LineChart
+        android:layout_width="600dp"
+        android:layout_height="300dp"
+        android:id="@+id/lineChart"/>
 
     <TextView
         android:id="@+id/text_view"
