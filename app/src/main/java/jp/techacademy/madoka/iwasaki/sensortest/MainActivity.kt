@@ -8,7 +8,6 @@ import android.hardware.SensorManager
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.TextView
-import java.text.SimpleDateFormat
 import java.util.*
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
@@ -69,7 +68,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     + " Z: " + sensorZ)
             textView!!.text = strTmp
 
-            if(getNowTime() > suddenMoveTime + 2000 ){ // 前回記録時から1500ミリ秒以上経過していたら
+            if(getNowTime() > suddenMoveTime + 2000 ){ // 前回記録時から2000ミリ秒以上経過していたら
                 // 急停止/急加速時の処理
                 if(sensorZ >= 30) {
                     suddenMoveTime = getNowTime() // 記録時間を更新
@@ -82,6 +81,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                             + "\tsensorZ: " + sensorZ)
                 }
             }
+
             showInfo(event)
         }
     }
@@ -154,7 +154,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     }
 
-    // 1970 年 1 月 1 日 00:00:00から現在までの経過時間をミリ秒で表した数値を返す
+    // 1970 年 1 月 1 日 00:00:00から現在までの経過時間をミリ秒で表した数値を返す関数
     private fun getNowTime(): Long{
         val date = Date()
         return date.time
